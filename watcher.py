@@ -45,11 +45,20 @@ def llm_filter(titles):
         " with at most 3 picks, or an empty list if nothing clears the bar. "
         "JSON only, no other text."
     )
-    payload = {"model": "openai/gpt-oss-120b", "messages": [{"role": "user", "content": prompt}],
+    # Use whichever free provider the key belongs to: gsk_ = Groq,
+    # AQ. = Google AI Studio (Gemini). Same OpenAI-compatible shape.
+    if key.startswith("gsk_"):
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        model = "openai/gpt-oss-120b"
+    else:
+        url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+        model = "gemini-3.5-flash"
+    print(f"diag: using {model}", file=sys.stderr)
+    payload = {"model": model, "messages": [{"role": "user", "content": prompt}],
                "max_tokens": 500, "temperature": 0.2}
     for attempt in range(3):
         try:
-            req = urllib.request.Request("https://api.groq.com/openai/v1/chat/completions",
+            req = urllib.request.Request(url,
                 data=json.dumps(payload).encode(),
                 headers={"Authorization": "Bearer " + key, "Content-Type": "application/json",
                          "User-Agent": "curl/8.5.0"})
