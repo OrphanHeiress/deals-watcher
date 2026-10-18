@@ -1,0 +1,17 @@
+name: keepalive
+on:
+  schedule:
+    - cron: "0 9 1 * *"   # monthly - prevents GitHub disabling the digest after 60 idle days
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git config user.name "keepalive-bot"
+          git config user.email "noreply@github.com"
+          git commit --allow-empty -m "keepalive: scheduled workflows still active"
+          git push
