@@ -79,7 +79,9 @@ def main():
         print("no deals fetched"); return
     picks = llm_filter(titles)
     if picks is None:
-        print("filter failed"); return
+        # Infrastructure failure must be LOUD: exit non-zero so the Actions run
+        # shows red. Silence (exit 0) is reserved for "nothing clears the bar".
+        print("filter failed - secrets missing or LLM unreachable"); sys.exit(1)
     if not picks.get("picks"):
         print("nothing clears the bar today - silence"); return
     lines = ["Good deals today:"]
