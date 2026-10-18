@@ -29,7 +29,11 @@ def fetch(max_items=25):
 def llm_filter(titles):
     key = os.environ.get("GROQ_API_KEY")
     if not key:
+        print("diag: GROQ_API_KEY is EMPTY/MISSING", file=sys.stderr)
         return None
+    # Diagnostic, safe for public logs: prefix + length + whitespace only.
+    ws = any(c.isspace() for c in key)
+    print(f"diag: key prefix={key[:4]!r} length={len(key)} whitespace={ws}", file=sys.stderr)
     corpus = "\n".join(f"{i+1}. {t}" for i, t in enumerate(titles))
     prompt = (
         "You filter deals for one person. Her interests: " + INTERESTS + ".\n"
